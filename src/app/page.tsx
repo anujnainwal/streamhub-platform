@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/accordion";
 import { motion } from "framer-motion";
 import { useCallback } from "react";
+import HomePage from "@/pages/home/Home";
 
 const page = () => {
   const handleNavigation = useCallback((e: React.MouseEvent) => {
@@ -114,9 +115,9 @@ const page = () => {
         </div>
       </div>
       {/* Main Content Below */}
-      {/* <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <HomePage />
-      </div> */}
+      </div>
 
       {/* Watch Any Device */}
       <div className="mt-15 bg-[#DDDDDD] ">
