@@ -53,23 +53,21 @@ export const getRemainingDays = (user?: UserInfo | null): number => {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
-// export const userInfo: UserInfo = {
-//   id: "1",
-//   username: "john_doe",
-//   email: "john@example.com",
-//   fullName: "John Doe",
-//   avatar: "/avatars/john.jpg",
-//   subscription: {
-//     id: "sub_1",
-//     plan: "premium",
-//     status: "active",
-//     startDate: new Date("2025-05-01"),
-//     endDate: new Date("2025-12-09"),
-//     autoRenew: true,
-//   },
-//   isActive: true,
-//   joinedDate: new Date("2023-12-01"),
-//   lastLogin: new Date("2024-01-15"),
-// };
-
-export const userInfo: null | UserInfo = null;
+export const userInfo: UserInfo = {
+  id: "1",
+  username: "john_doe",
+  email: "john@example.com",
+  fullName: "John Doe",
+  avatar: "/avatars/john.jpg",
+  subscription: {
+    id: "sub_1",
+    plan: "premium",
+    status: "active",
+    startDate: new Date("2025-05-01"),
+    endDate: new Date("2025-12-09"),
+    autoRenew: true,
+  },
+  isActive: true,
+  joinedDate: new Date("2023-12-01"),
+  lastLogin: new Date("2024-01-15"),
+};
