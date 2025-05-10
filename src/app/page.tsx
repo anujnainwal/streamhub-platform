@@ -2,7 +2,6 @@
 
 import { movieList, watchAnyDeviceContent } from "@/constant/images/image_list";
 import { useTypewriter } from "@/hooks/useTypewriter";
-import HomePage from "@/pages/home/Home";
 import Image from "next/image";
 import Link from "next/link";
 import { PiArrowArcRightThin, PiDotOutlineFill } from "react-icons/pi";
