@@ -1,23 +1,32 @@
+"use client";
 import React from "react";
 import Header from "../header/Header";
 import Footer from "../footers/Footer";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 interface LayoutsProps {
   children: React.ReactNode;
 }
 const Layouts = ({ children }: LayoutsProps) => {
+  const { scrollToTop, showButton } = useScrollToTop();
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      {/* <main className="flex-1 flex selection:bg-black selection:text-white">
-        <div className="container mx-auto px-4 md:px-6 lg:px-8">{children}</div>
-      </main> */}
-      <main className="  selection:bg-black selection:text-white">
+      <main className="flex-1 relative selection:bg-black selection:text-white">
         {children}
       </main>
       <Footer />
+      <button
+        onClick={scrollToTop}
+        className={`fixed cursor-pointer bottom-8 right-8 px-4 py-3 bg-[#9A9A9A] text-white rounded-[5px] shadow-lg hover:bg-[#b8301f] transition-all duration-300 z-50 ${
+          showButton
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-12 pointer-events-none"
+        }`}
+      >
+        ↑
+      </button>
     </div>
   );
 };
-
 export default Layouts;

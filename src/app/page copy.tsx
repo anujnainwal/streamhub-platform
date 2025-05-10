@@ -15,7 +15,7 @@ import {
 import { motion } from "framer-motion";
 import { useCallback } from "react";
 
-const page = () => {
+const Home = () => {
   const handleNavigation = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     // Add any pre-navigation logic here if needed
@@ -202,4 +202,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Home;
