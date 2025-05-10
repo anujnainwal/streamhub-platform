@@ -72,4 +72,4 @@ export const getRemainingDays = (user?: UserInfo | null): number => {
 //   lastLogin: new Date("2024-01-15"),
 // };
 
-export const userInfo: UserInfo = null;
+export const userInfo: null | UserInfo = null;
