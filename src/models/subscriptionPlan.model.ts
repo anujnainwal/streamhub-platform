@@ -42,7 +42,7 @@ const planSchema = new mongoose.Schema(
     interval: {
       type: String,
       enum: ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"],
-      default: "MONTHLY",
+      default: "DAILY",
       required: true,
     },
 
@@ -81,6 +81,8 @@ const planSchema = new mongoose.Schema(
 planSchema.index({ plan_id: 1, status: 1 });
 planSchema.index({ type: 1, interval: 1 });
 
-const SubscriptionPlanModel = mongoose.model("SubscriptionPlan", planSchema);
+const SubscriptionPlanModel =
+  mongoose.models.SubscriptionPlan ||
+  mongoose.model("SubscriptionPlan", planSchema);
 
 export default SubscriptionPlanModel;

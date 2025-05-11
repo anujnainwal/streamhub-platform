@@ -3,6 +3,7 @@ import { ApiResponse } from "@/utils/response.utils";
 import { register_user } from "@/validation/auth/auth_validation";
 import dbConnect from "@/lib/db";
 import UserModel from "@/models/userSchema.model";
+import { createStripeCustomer } from "@/lib/stripe.helper.lib";
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,6 +32,18 @@ export async function POST(request: NextRequest) {
     }
 
     const newUser = await UserModel.create(value);
+    await createStripeCustomer({
+      firstName: value.firstname,
+      lastName: value.lastname,
+      email: value.email,
+      username: value.username,
+      metadata: {
+        firstName: value.firstname,
+        lastName: value.lastname,
+        username: value.username,
+        email: value.email,
+      },
+    });
     return ApiResponse.created(newUser, "Registration successful");
   } catch (error: any) {
     return ApiResponse.error("Registration failed", 500, error);

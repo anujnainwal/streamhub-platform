@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
       { apiVersion: "1.0" },
       request.url
     );
-  } catch (error) {
+  } catch (error: any) {
     return ApiResponse.error(
       "Internal server error",
       HttpStatus.INTERNAL_SERVER_ERROR,
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     return ApiResponse.created(body);
-  } catch (error) {
+  } catch (error: any) {
     return ApiResponse.badRequest("Invalid request body", error);
   }
 }
