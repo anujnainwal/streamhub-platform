@@ -1,10 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { useGetPlansQuery } from "@/features/subscriptionApi/subscriptionApi";
+import {
+  useCreateCheckoutSessionMutation,
+  useGetPlansQuery,
+} from "@/features/subscriptionApi/subscriptionApi";
 import { useForm } from "react-hook-form";
 import { joiResolver } from "@hookform/resolvers/joi";
-import Joi from "joi";
+import Joi, { isError } from "joi";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,13 +21,15 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { useRegisterUserMutation } from "@/features/auth/authApi";
+import { toast } from "sonner";
 
 const signupSchema = Joi.object({
-  firstName: Joi.string().required().min(2).messages({
+  firstname: Joi.string().required().min(2).messages({
     "string.empty": "First name is required",
     "string.min": "First name must be at least 2 characters",
   }),
-  lastName: Joi.string().required().min(2).messages({
+  lastname: Joi.string().required().min(2).messages({
     "string.empty": "Last name is required",
     "string.min": "Last name must be at least 2 characters",
   }),
@@ -46,8 +51,8 @@ const signupSchema = Joi.object({
 });
 
 interface SignupFormData {
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   username: string;
   email: string;
   password: string;
@@ -55,22 +60,60 @@ interface SignupFormData {
 
 const SubscriptionPlansPage = () => {
   const [selectedPlan, setSelectedPlan] = useState<string>("Standard");
-  const [selectedPlanId, setSelectedPlanId] = useState<string>("");
+  const [selectedPlanId, setSelectedPlanId] = useState("");
   const [step, setStep] = useState<number>(1);
-  const { data, error, isLoading } = useGetPlansQuery({ page: 1, limit: 10 });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { data, error, isLoading }: any = useGetPlansQuery();
   const form = useForm<SignupFormData>({
     resolver: joiResolver(signupSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      firstname: "",
+      lastname: "",
       username: "",
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = (data: SignupFormData) => {
-    console.log({ ...data, planId: selectedPlanId });
+  const [registerUser, registerUserStatus] = useRegisterUserMutation();
+  const [createSession, { isLoading: isCheckoutLoading }] =
+    useCreateCheckoutSessionMutation();
+
+  const {
+    isLoading: isRegisterLoading,
+    isSuccess: isRegisterSuccess,
+    isError: isRegisterError,
+    error: registerError,
+  } = registerUserStatus;
+
+  const onSubmit = async (data: SignupFormData) => {
+    setIsProcessing(true);
+    let formDetails: any = {
+      ...data,
+      planId: selectedPlanId,
+    };
+    try {
+      const response: any = await registerUser(formDetails).unwrap();
+      console.log("Registration success:", response);
+      if (response.status) {
+        toast.success("User Registered Successfully.");
+        let userId = response?.data?.newUser?._id;
+        const repose: any = await createSession({
+          user_id: userId,
+          planId: selectedPlanId,
+        }).unwrap();
+        console.log("Checkout session created:", repose);
+        if (repose.status) {
+          window.location.href = repose?.data?.sessionUrl;
+        }
+      }
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      // let { error: errorDetails } = error.data;
+      // toast.error(errorDetails.message);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (isLoading) {
@@ -119,9 +162,7 @@ const SubscriptionPlansPage = () => {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-10">
               {data?.data?.plans?.map((plan: any) => {
                 const isActive = selectedPlan === plan.name;
-                {
-                  console.log("Sadsad", plan);
-                }
+
                 return (
                   <Card
                     key={plan._id}
@@ -191,7 +232,7 @@ const SubscriptionPlansPage = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="firstName"
+                      name="firstname"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>First Name</FormLabel>
@@ -204,7 +245,7 @@ const SubscriptionPlansPage = () => {
                     />
                     <FormField
                       control={form.control}
-                      name="lastName"
+                      name="lastname"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Last Name</FormLabel>
@@ -278,8 +319,32 @@ const SubscriptionPlansPage = () => {
                     >
                       Back
                     </Button>
-                    <Button type="submit" className="flex-1">
+                    {/* <Button type="submit" className="flex-1">
                       Complete Sign Up
+                    </Button> */}
+                    <Button
+                      type="submit"
+                      className="flex-1"
+                      disabled={
+                        isProcessing ||
+                        isCheckoutLoading ||
+                        registerUserStatus.isLoading
+                      }
+                    >
+                      {isProcessing ||
+                      isCheckoutLoading ||
+                      registerUserStatus.isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          {registerUserStatus.isLoading
+                            ? "Registering..."
+                            : isCheckoutLoading
+                            ? "Processing Payment..."
+                            : "Processing..."}
+                        </>
+                      ) : (
+                        "Complete Sign Up"
+                      )}
                     </Button>
                   </div>
                 </form>

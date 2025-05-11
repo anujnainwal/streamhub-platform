@@ -4,6 +4,7 @@ import { register_user } from "@/validation/auth/auth_validation";
 import dbConnect from "@/lib/db";
 import UserModel from "@/models/userSchema.model";
 import { createStripeCustomer } from "@/lib/stripe.helper.lib";
+import { generateToken } from "@/utils/generateToken.utils";
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,7 +45,11 @@ export async function POST(request: NextRequest) {
         email: value.email,
       },
     });
-    return ApiResponse.created(newUser, "Registration successful");
+    let accessToken = await generateToken({ _id: newUser._id });
+    return ApiResponse.created(
+      { newUser, token: accessToken },
+      "Registration successful"
+    );
   } catch (error: any) {
     return ApiResponse.error("Registration failed", 500, error);
   }

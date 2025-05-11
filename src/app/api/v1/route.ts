@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 export async function GET(request: NextRequest) {
   try {
     const data = { version: "1.0.0" };
+
     return ApiResponse.success(
       data,
       "API is working",

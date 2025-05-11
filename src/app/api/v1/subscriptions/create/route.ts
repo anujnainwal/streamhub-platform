@@ -59,7 +59,7 @@ export async function POST(request: Request) {
           quantity: 1,
         },
       ],
-      success_url: `http://localhost:3000/payment?success=true&session_id={CHECKOUT_SESSION_ID}&plan=${planDetails.plan_id}&customer=${stripeCustomerId.id}`,
+      success_url: `http://localhost:3000/payment?success=true&sessionId={CHECKOUT_SESSION_ID}&plan=${planDetails.plan_id}&customer=${stripeCustomerId.id}&userId=${userDetails._id}`,
       cancel_url: `http://localhost:3000/payment?canceled=true&plan=${planDetails.plan_id}`,
       subscription_data: {
         trial_period_days: 1,
