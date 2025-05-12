@@ -47,6 +47,7 @@ export default function PaymentSuccessPage() {
   );
 
   const result: any = data;
+  console.log("res", result);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(sessionId);
@@ -62,7 +63,7 @@ export default function PaymentSuccessPage() {
   }
 
   // Failure UI
-  if (isError || !data?.status || !result?.paid) {
+  if (isError || !result?.stripe_status || !result?.paid) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
         <Card className="w-full max-w-md">
