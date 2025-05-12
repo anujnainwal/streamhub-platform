@@ -19,6 +19,47 @@ export default function PaymentSuccessPage() {
   const params: any = useSearchParams();
   const sessionId = params.get("sessionId") ?? "";
   const userId = params.get("userId") ?? "";
+  const cancel = params.get("cancel") ?? "";
+  const planId = params.get("planId") ?? "";
+
+  // If cancel=2 and planId is present, show cancel UI
+  if (cancel === "true") {
+    // const plan = plansData.find(
+    //   (p: any) => p.id === planId || p.plan_id === planId
+    // );
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center space-y-4">
+            <div className="mx-auto p-4 bg-yellow-100 rounded-full">
+              <XCircle className="h-8 w-8 text-yellow-600" aria-hidden />
+            </div>
+            <CardTitle className="text-2xl font-semibold">
+              Subscription Cancelled
+            </CardTitle>
+            <p className="text-gray-600">
+              You have cancelled the plan
+              {/* {plan ? (
+                <>
+                  : <span className="font-bold">{plan.name}</span> for{" "}
+                  <span className="font-bold">
+                    ${plan.price?.amount ?? plan.price}
+                  </span>
+                </>
+              ) : (
+                "."
+              )} */}
+            </p>
+          </CardHeader>
+          <CardFooter className="flex justify-center">
+            <Button onClick={() => router.push("/plans")}>
+              Choose Another Plan
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 
   if (!sessionId || !userId) {
     return (
