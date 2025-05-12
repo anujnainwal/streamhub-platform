@@ -59,8 +59,8 @@ export async function POST(request: Request) {
           quantity: 1,
         },
       ],
-      success_url: `http://localhost:3000/payment?success=true&sessionId={CHECKOUT_SESSION_ID}&plan=${planDetails.plan_id}&customer=${stripeCustomerId.id}&userId=${userDetails._id}`,
-      cancel_url: `http://localhost:3000/payment?canceled=true&plan=${planDetails.plan_id}`,
+      success_url: `${process.env.STRIPE_REDIRECT_URL}/payment?success=true&sessionId={CHECKOUT_SESSION_ID}&plan=${planDetails.plan_id}&customer=${stripeCustomerId.id}&userId=${userDetails._id}`,
+      cancel_url: `${process.env.STRIPE_REDIRECT_URL}/payment?canceled=true&plan=${planDetails.plan_id}`,
       subscription_data: {
         trial_period_days: 1,
         metadata: {
