@@ -20,6 +20,27 @@ export default function PaymentSuccessPage() {
   const sessionId = params.get("sessionId") ?? "";
   const userId = params.get("userId") ?? "";
 
+  if (!sessionId || !userId) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center space-y-4">
+            <XCircle className="h-8 w-8 text-red-600 mx-auto" aria-hidden />
+            <CardTitle className="text-2xl font-semibold">
+              Invalid Payment Link
+            </CardTitle>
+            <p className="text-gray-600">
+              Missing payment session or user information.
+            </p>
+          </CardHeader>
+          <CardFooter className="flex justify-center">
+            <Button onClick={() => router.push("/")}>Go Home</Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
+
   const { data, isLoading, isError } = useGetVerifyPaymentQuery(
     { sessionId, userId },
     { skip: !sessionId || !userId }
