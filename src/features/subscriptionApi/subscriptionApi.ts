@@ -51,6 +51,8 @@ export const subscriptionApi = createApi({
           sessionId
         )}&userId=${encodeURIComponent(userId)}`,
       providesTags: ["Subscription"],
+      transformResponse: (response: { data: VerifyPaymentResponse }) =>
+        response.data,
     }),
 
     // Create a Stripe checkout session

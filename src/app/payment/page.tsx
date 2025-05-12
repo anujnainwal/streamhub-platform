@@ -25,7 +25,7 @@ export default function PaymentSuccessPage() {
     { skip: !sessionId || !userId }
   );
 
-  const result: any = data?.data;
+  const result: any = data;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(sessionId);
