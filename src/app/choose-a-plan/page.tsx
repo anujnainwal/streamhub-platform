@@ -23,6 +23,8 @@ import { Check, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useRegisterUserMutation } from "@/features/auth/authApi";
 import { toast } from "sonner";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useRouter } from "next/navigation";
 
 const signupSchema = Joi.object({
   firstname: Joi.string().required().min(2).messages({
@@ -59,11 +61,14 @@ interface SignupFormData {
 }
 
 const SubscriptionPlansPage = () => {
+  const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<string>("Standard");
   const [selectedPlanId, setSelectedPlanId] = useState("");
+
   const [step, setStep] = useState<number>(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const { data, error, isLoading }: any = useGetPlansQuery();
+  const [token, setToken] = useLocalStorage<string>("token", "");
   const form = useForm<SignupFormData>({
     resolver: joiResolver(signupSchema),
     defaultValues: {
@@ -98,13 +103,19 @@ const SubscriptionPlansPage = () => {
       if (response.status) {
         toast.success("User Registered Successfully.");
         let userId = response?.data?.newUser?._id;
+        if (response.data?.token) {
+          setToken(response.data.token);
+        }
+
         const repose: any = await createSession({
           user_id: userId,
           planId: selectedPlanId,
         }).unwrap();
+
         console.log("Checkout session created:", repose);
         if (repose.status) {
-          window.location.href = repose?.data?.sessionUrl;
+          // window.location.href = repose?.data?.sessionUrl;
+          router.push(repose?.data?.sessionUrl);
         }
       }
     } catch (error: any) {
