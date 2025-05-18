@@ -42,7 +42,7 @@ type LoginFormValues = {
 };
 type LoginPageProps = {
   type?: string;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpen: (open: boolean) => void;
 };
 export default function LoginPage({ type, setOpen }: LoginPageProps) {
   const router = useRouter();

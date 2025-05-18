@@ -244,7 +244,7 @@ const Header = () => {
             <Link
               key={item.id}
               href={`/${item.value}`}
-              className="block px-4 py-2 text-white hover:bg-gray-700 flex items-center"
+              className=" px-4 py-2 text-white hover:bg-gray-700 flex items-center"
             >
               <item.icon className="mr-2" />
               {item.label}
