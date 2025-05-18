@@ -51,8 +51,9 @@ export async function POST(request: Request) {
     const session = await customStripe.checkout.sessions.create({
       customer: stripeCustomerId.id,
       mode: "subscription",
+      //  payment_method_configuration: "pmc_1RHOaRSAnIRrnijrS2vyNcHg",
       payment_method_types: ["card"],
-      // customer_email: userDetails.email,
+
       line_items: [
         {
           price: planDetails.stripePriceId,

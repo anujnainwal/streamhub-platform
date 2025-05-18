@@ -78,6 +78,7 @@ const login_user = Joi.object({
   password: Joi.string().required().messages({
     "string.empty": "Password is required",
   }),
+  rememberMe: Joi.boolean().optional().default(false),
 });
 
 export { register_user, login_user };

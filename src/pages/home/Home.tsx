@@ -50,18 +50,26 @@ const HomePage = () => {
   return (
     <div>
       {/* Tv Frame Content */}
-      <div className="mt-10 mb-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          <TVFrame src={TVFrameContent.MOVIE_ONE} />
-          <div className="space-y-4">
-            <h1 className="text-5xl flex items-center font-bold text-gray-800">
-              <PiDotOutlineFill color="red" fontSize={30} /> Enjoy Your Content
+      <div className="container mx-auto px-4 my-10 md:my-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center">
+          {/* TV Frame - Full width on mobile, half width on desktop */}
+          <div className="w-full">
+            <TVFrame src={TVFrameContent.MOVIE_ONE} />
+          </div>
+
+          {/* Content Section - Better spacing and responsive text */}
+          <div className="space-y-4 md:space-y-6 text-center md:text-left">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl flex items-center justify-center md:justify-start font-bold text-gray-800">
+              <PiDotOutlineFill color="red" className="text-2xl md:text-3xl" />
+              <span>Enjoy Your Content</span>
             </h1>
-            <p className="text-[grey] px-2 mt-8">
+
+            <p className="text-[grey] text-sm md:text-base lg:text-lg px-2 md:px-0 mt-4 md:mt-8">
               Stream your favorite movies, series, and classics anytime,
               anywhere—no ads, no limits.
             </p>
-            <Button className="p-8 cursor-pointer bg-[#CE3824] text-white hover:bg-[#ECECEC] hover:text-[#000000d3]">
+
+            <Button className="w-full md:w-auto p-4 md:p-6 lg:p-8 cursor-pointer bg-[#CE3824] text-white hover:bg-[#ECECEC] hover:text-[#000000d3] text-sm md:text-base transition-all duration-300">
               View Video Library
             </Button>
           </div>

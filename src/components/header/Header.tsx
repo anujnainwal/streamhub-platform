@@ -1,30 +1,46 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaStream,
   FaCreditCard,
   FaBars,
-  FaTimes,
   FaUser,
+  FaTimes,
+  FaSearch,
+  FaHome,
+  FaFilm,
+  FaTv,
+  FaMicrophone,
+  FaListUl,
 } from "react-icons/fa";
 import { MdVideoLibrary } from "react-icons/md";
 import { Button } from "../ui/button";
 import { userInfo, isSubscribed } from "@/userInfo";
+import Joi from "joi";
+import { Input } from "../ui/input";
+import { useDispatch, useSelector } from "react-redux";
+import { setCredentials } from "@/features/auth/authSlice";
+import Link from "next/link";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import Joi from "joi";
-import { Input } from "../ui/input";
+} from "../ui/dialog";
 import { Label } from "../ui/label";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Home } from "lucide-react";
+import UserProfile from "./UserProfile";
+import LoginPage from "@/app/login/page";
 
 const Header = () => {
+  let router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  let dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -83,13 +99,15 @@ const Header = () => {
       // Handle form submission
     }
   };
+  let authInfo = useSelector((state?: any) => state.authInfo);
+  console.log(authInfo);
 
   const itemList = [
     {
       id: 1,
-      label: "Video Library",
-      icon: MdVideoLibrary,
-      value: "video-library",
+      label: "Home",
+      icon: FaHome,
+      value: "",
     },
     ...(!isSubscribed(userInfo)
       ? [
@@ -103,181 +121,146 @@ const Header = () => {
       : [
           {
             id: 2,
+            label: "Movies",
+            icon: FaFilm,
+            value: "movies",
+          },
+          {
+            id: 3,
+            label: "Series",
+            icon: FaTv,
+            value: "series",
+          },
+          {
+            id: 4,
+            label: "Podcasts",
+            icon: FaMicrophone,
+            value: "podcasts",
+          },
+          {
+            id: 6,
             label: "Watch List",
-            icon: FaCreditCard,
-            value: "Watch List",
+            icon: FaListUl,
+            value: "watch-list",
           },
         ]),
   ];
-
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      const userInfo = localStorage.getItem("userInfo");
+      if (token && userInfo) {
+        dispatch(
+          setCredentials({
+            token: JSON.parse(token),
+            userInfo: JSON.parse(userInfo),
+          })
+        );
+      }
+    }
+  }, [dispatch]);
   return (
-    <div className="sticky top-0 z-50 bg-white flex flex-col md:flex-row justify-between border-b border-gray-200 p-5">
-      <div className="flex justify-between items-center">
-        <Link href="/">
-          <span className="font-bold flex gap-2 justify-center items-center cursor-pointer">
-            <FaStream fontSize={15} />
-            Streaming Hub
-          </span>
-        </Link>
+    <div className="relative">
+      <div className="flex items-center justify-between px-4 py-2 bg-gray-800">
+        <div className="flex items-center">
+          <Link href={"/"} className="flex items-center">
+            <FaStream className="text-white text-2xl" />
+            <span className="ml-2 text-white text-xl font-bold">StreamHub</span>
+          </Link>
+        </div>
+
+        {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-gray-600 hover:text-gray-900"
+          className="md:hidden text-white"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
-          {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+          {isMenuOpen ? <FaTimes /> : <FaBars />}
         </button>
-      </div>
 
-      <div
-        className={`${
-          isMenuOpen ? "flex" : "hidden"
-        } md:flex flex-col md:flex-row gap-5 justify-center items-center mt-4 md:mt-0 transition-all duration-300 ease-in-out`}
-      >
-        <ul className="flex flex-col md:flex-row gap-4">
-          {itemList.map((item) => (
-            <li
-              key={item.id}
-              className="flex items-center gap-2 text-[#747574] hover:text-[#000000e1] cursor-pointer transition-colors duration-200"
+        {/* Desktop Navigation */}
+
+        <nav className="hidden md:flex items-center justify-between w-full">
+          {/* Left side navigation */}
+
+          {authInfo?.token !== null ? (
+            <div className="flex gap-10 ml-[20%]">
+              {itemList.map((item: any) => (
+                <Link
+                  key={item.id}
+                  href={`/${item.value}`}
+                  className="text-white hover:text-gray-300 flex items-center text-sm font-medium"
+                >
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <Link
+              href="/"
+              className="text-white hover:text-gray-300 flex items-center text-sm font-medium"
             >
-              <item.icon fontSize={15} />
-              {item.label}
-            </li>
-          ))}
-        </ul>
-        <hr className="w-full md:w-auto md:h-10 border-t md:border-t-0 md:border-l border-gray-200 self-center" />
-        {isSubscribed(userInfo) ? (
-          <div className="flex items-center gap-2 cursor-pointer">
-            {userInfo.avatar ? (
-              <img
-                src={userInfo.avatar}
-                alt="Profile"
-                className="w-8 h-8 rounded-full"
-              />
-            ) : (
-              <FaUser className="w-8 h-8 p-1 rounded-full bg-gray-200" />
+              <Home className="mr-2 h-4 w-4" />
+              Home
+            </Link>
+          )}
+
+          {/* Right side with search and profile */}
+          <div className="flex items-center space-x-4">
+            {authInfo?.token !== null && (
+              <div className="relative w-64">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="w-full px-4 py-2 bg-gray-800 text-white rounded-full
+                     border border-gray-700 focus:outline-none focus:border-gray-500
+                     text-sm placeholder-gray-400"
+                />
+                <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              </div>
             )}
-            <span className="text-sm font-medium">{userInfo.username}</span>
-          </div>
-        ) : (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="bg-[#ee2626] w-full md:w-auto cursor-pointer text-white hover:bg-white hover:text-black transition-all duration-300 border border-[#ff6b6b] hover:shadow-md">
-                Sign In
+
+            {!authInfo?.token ? (
+              <Button
+                onClick={() => setOpen(true)}
+                className="px-4 py-2 text-sm font-medium"
+              >
+                Login
               </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-semibold text-gray-700">
-                  Please Login
-                </DialogTitle>
-                <DialogDescription>
-                  <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-                    <div className="space-y-5">
-                      {/* Username / Email Field */}
-                      <div className="relative">
-                        <Label
-                          htmlFor="email"
-                          className="text-sm font-medium text-gray-700"
-                        >
-                          Email <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                          type="email"
-                          name="email"
-                          id="email"
-                          placeholder="Enter your email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          className={`w-full mt-1 rounded-md border ${
-                            errors.email ? "border-red-500" : "border-gray-300"
-                          } px-3 py-2 text-gray-700 placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500`}
-                        />
-                        {errors.email && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.email}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Password Field */}
-                      <div className="relative">
-                        <Label
-                          htmlFor="password"
-                          className="text-sm font-medium text-gray-700"
-                        >
-                          Password <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                          type="password"
-                          name="password"
-                          id="password"
-                          placeholder="Enter your password"
-                          value={formData.password}
-                          onChange={handleChange}
-                          className={`w-full mt-1 rounded-md border ${
-                            errors.password
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          } px-3 py-2 text-gray-700 placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500`}
-                        />
-                        {errors.password && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.password}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Remember Me + Forgot Password */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            name="rememberMe"
-                            id="rememberMe"
-                            checked={formData.rememberMe}
-                            onChange={handleChange}
-                            className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
-                          />
-                          <label
-                            htmlFor="rememberMe"
-                            className="ml-2 text-sm text-gray-600 select-none"
-                          >
-                            Remember me
-                          </label>
-                        </div>
-                        <a
-                          href="#"
-                          className="text-sm font-medium text-red-600 hover:underline hover:text-red-500 transition"
-                        >
-                          Forgot Password?
-                        </a>
-                      </div>
-
-                      {/* Submit Button */}
-                      <Button
-                        type="submit"
-                        className="w-full rounded-md bg-red-600 py-3 text-white font-semibold hover:bg-red-700 transition-colors"
-                      >
-                        LOGIN
-                      </Button>
-
-                      {/* Sign-up Link */}
-                      <div className="text-center text-sm text-gray-600">
-                        Don’t have an account?{" "}
-                        <a
-                          href="#"
-                          className="text-red-600 font-medium hover:underline hover:text-red-500 transition"
-                        >
-                          Sign up
-                        </a>
-                      </div>
-                    </div>
-                  </form>
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
-        )}
+            ) : (
+              <UserProfile
+                userInfo={authInfo?.userInfo}
+                onSignOut={() => console.log()}
+              />
+            )}
+          </div>
+        </nav>
       </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-gray-800">
+          {itemList.map((item: any) => (
+            <Link
+              key={item.id}
+              href={`/${item.value}`}
+              className="block px-4 py-2 text-white hover:bg-gray-700 flex items-center"
+            >
+              <item.icon className="mr-2" />
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Login</DialogTitle>
+          </DialogHeader>
+          <LoginPage type="loginModal" setOpen={setOpen} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

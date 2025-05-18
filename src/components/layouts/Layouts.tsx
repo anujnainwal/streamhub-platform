@@ -3,6 +3,7 @@ import React from "react";
 import Header from "../header/Header";
 import Footer from "../footers/Footer";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
+import { FaArrowUp } from "react-icons/fa";
 
 interface LayoutsProps {
   children: React.ReactNode;
@@ -24,7 +25,7 @@ const Layouts = ({ children }: LayoutsProps) => {
             : "opacity-0 translate-y-12 pointer-events-none"
         }`}
       >
-        ↑
+        <FaArrowUp fontSize={20} />
       </button>
     </div>
   );
