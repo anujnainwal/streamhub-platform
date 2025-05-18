@@ -44,7 +44,7 @@ type LoginPageProps = {
   type?: string;
   setOpen: (open: boolean) => void;
 };
-export default function LoginPage({ type, setOpen }: LoginPageProps) {
+const LoginPage = ({ type, setOpen }: LoginPageProps) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
@@ -212,4 +212,5 @@ export default function LoginPage({ type, setOpen }: LoginPageProps) {
       </div>
     </div>
   );
-}
+};
+export default LoginPage;
