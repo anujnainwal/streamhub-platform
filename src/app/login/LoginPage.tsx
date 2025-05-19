@@ -71,7 +71,7 @@ const LoginPage = ({ type, setOpen }: LoginPageProps) => {
           userInfo: result.data.userInfo,
         })
       );
-      setOpen(false);
+      if (setOpen !== undefined) setOpen(false);
       form.reset();
     } catch (error: any) {
       toast.error(error.data.error.message);
