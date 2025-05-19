@@ -32,7 +32,7 @@ import { Label } from "../ui/label";
 import { useRouter } from "next/navigation";
 import { Home } from "lucide-react";
 import UserProfile from "./UserProfile";
-import LoginPage from "@/app/login/page";
+import LoginPage from "@/app/login/LoginPage";
 
 const Header = () => {
   let router = useRouter();
