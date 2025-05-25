@@ -2,7 +2,6 @@
 import { baseQueryApi } from "@/config/baseApiConfig";
 import { createApi } from "@reduxjs/toolkit/query/react";
 
-// --- TypeScript types for request/responses ---
 export interface Plan {
   id: string;
   name: string;
@@ -29,7 +28,22 @@ export interface VerifyPaymentResponse {
   message: string;
 }
 
-// --- RTK Query slice ---
+interface PaymentMethodData {
+  id: string;
+  brand: string;
+  last4: string;
+  expYear: number;
+  expMonth: number;
+  funding: string;
+  country: string;
+  isDefault?: boolean;
+}
+
+interface PaymentMethodResponse {
+  setupIntentClientSecret: string;
+  cards: PaymentMethodData[];
+}
+
 export const subscriptionApi = createApi({
   reducerPath: "subscriptionApi",
   baseQuery: baseQueryApi,
@@ -41,7 +55,6 @@ export const subscriptionApi = createApi({
       providesTags: ["Subscription"],
     }),
 
-    // Verify payment after checkout
     getVerifyPayment: builder.query<
       VerifyPaymentResponse,
       { sessionId: string; userId: string }
@@ -67,6 +80,13 @@ export const subscriptionApi = createApi({
       }),
       invalidatesTags: ["Subscription"],
     }),
+    //fetch payment attached method
+    getPaymentMethod: builder.query<PaymentMethodResponse, void>({
+      query: () => "/subscriptions/payment-method",
+      providesTags: ["Subscription"],
+      transformResponse: (response: { data: PaymentMethodResponse }) =>
+        response.data,
+    }),
   }),
 });
 
@@ -74,4 +94,5 @@ export const {
   useGetPlansQuery,
   useGetVerifyPaymentQuery,
   useCreateCheckoutSessionMutation,
+  useGetPaymentMethodQuery,
 } = subscriptionApi;

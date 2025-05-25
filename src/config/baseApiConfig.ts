@@ -5,7 +5,8 @@ export const baseQueryApi = fetchBaseQuery({
   prepareHeaders: (headers) => {
     const token = localStorage.getItem("token");
     if (token) {
-      headers.set("authorization", `Bearer ${token}`);
+      let modifiedToken = typeof token === "string" ? JSON.parse(token) : token;
+      headers.set("Authorization", `Bearer ${modifiedToken}`);
     }
     return headers;
   },

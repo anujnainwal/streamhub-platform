@@ -1,4 +1,4 @@
-import { SignJWT } from "jose";
+import { jwtVerify, SignJWT, JWTPayload } from "jose";
 import { TextEncoder } from "util";
 import { v4 as uuidv4 } from "uuid";
 
@@ -17,4 +17,18 @@ export async function generateToken(payload: Record<string, unknown>) {
     .setAudience(audience)
     .setJti(uuidv4())
     .sign(hsSecret);
+}
+
+export async function verifyToken(token: string): Promise<JWTPayload | null> {
+  try {
+    const { payload } = await jwtVerify(token, hsSecret, {
+      issuer: process.env.JWT_ISSUER,
+      audience: process.env.JWT_AUDIENCE,
+    });
+
+    return payload; // This is your decoded user info
+  } catch (err) {
+    console.error("JWT verification failed:", err);
+    return null;
+  }
 }

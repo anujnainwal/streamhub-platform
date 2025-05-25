@@ -1,8 +1,6 @@
 import { decodeJwt } from "jose";
 
-export function isValidToken(
-  token: string | null | undefined
-): boolean {
+export function isValidToken(token: string | null | undefined): boolean {
   if (!token) return false;
 
   try {

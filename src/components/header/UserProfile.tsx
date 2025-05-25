@@ -50,7 +50,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userInfo, onSignOut }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="focus:outline-none">
+        <button className="focus:outline-none cursor-pointer">
           <div className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors flex items-center justify-center">
             <FaUser className="text-gray-300 h-5 w-5" />
           </div>
@@ -65,19 +65,23 @@ const UserProfile: React.FC<UserProfileProps> = ({ userInfo, onSignOut }) => {
                 (item, index) => {
                   let icon;
                   let label;
+                  let path: string;
 
                   switch (item) {
                     case "my-profile":
                       icon = <FaUser className="mr-2" />;
                       label = "My Profile";
+                      path = "/my-profile";
                       break;
                     case "edit-profile":
                       icon = <FaCog className="mr-2" />;
                       label = "Edit Profile";
+                      path = "/edit-profile";
                       break;
                     case "manage-account":
                       icon = <FaCreditCard className="mr-2" />;
                       label = "Manage Account";
+                      path = "/manage-account";
                       break;
                     case "sign-out":
                       icon = <FaSignOutAlt className="mr-2" />;
@@ -92,9 +96,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ userInfo, onSignOut }) => {
                       <DropdownMenuItem
                         onClick={() => {
                           if (item === "sign-out") {
-                            handleLogout();
+                            handleLogout(); // sign-out logic
                           } else {
-                            router.push(`/${item}`);
+                            router.push(path);
                           }
                         }}
                         className="flex items-center p-2 text-[#706f6f] hover:text-[#706f6f] cursor-pointer"
