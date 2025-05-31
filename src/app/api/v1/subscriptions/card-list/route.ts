@@ -1,6 +1,6 @@
 import dbConnect from "@/lib/db";
 import customStripe from "@/lib/stripe";
-import { getCustomerByEmail } from "@/lib/stripe.helper.lib";
+import { getCustomerByEmail, getCustomerById } from "@/lib/stripe.helper.lib";
 import UserModel from "@/models/userSchema.model";
 import UserSubscriptionModel from "@/models/userSubscription.model";
 import { verifyToken } from "@/utils/generateToken.utils";
@@ -53,11 +53,12 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    let userDetails = subscription.user?.email as string;
-    const customer = await getCustomerByEmail(userDetails);
+    let userDetails = subscription.stripeCustomerId;
+    const customer = await getCustomerById(userDetails);
     const setupIntent = await customStripe.setupIntents.create({
       customer: customer.id,
       usage: "off_session",
+      payment_method_types: ["card"],
     });
 
     const defaultPaymentMethodId = subscription?.paymentMethodId;
@@ -100,7 +101,7 @@ export async function GET(request: NextRequest) {
         // defaultCardId: defaultPaymentMethodId || null,
         setupIntentClientSecret: setupIntent.client_secret,
       },
-      "Card Details dfetch successfully."
+      "Card Details fetch successfully."
     );
   } catch (error: any) {
     console.log("==>s", error);

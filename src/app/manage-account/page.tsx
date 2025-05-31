@@ -35,6 +35,7 @@ const ManageAccountPage = () => {
   const { data, isError, isLoading } = useGetPaymentMethodQuery(undefined, {
     skip: activeTab !== "payment",
   });
+  console.log("data", data);
 
   const [cardsState, setCardsState] = React.useState(data?.cards);
 

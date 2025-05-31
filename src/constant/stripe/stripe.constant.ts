@@ -6,8 +6,9 @@ const appearance: Appearance = {
     fontFamily: "'Inter', sans-serif",
     fontLineHeight: "1.5",
     borderRadius: "8px",
-    colorBackground: "#f0f0f0",
+    colorBackground: "#ffffff",
     accessibleColorOnColorPrimary: "#fff",
+    
   },
   rules: {
     ".Input": {

@@ -82,10 +82,22 @@ export const subscriptionApi = createApi({
     }),
     //fetch payment attached method
     getPaymentMethod: builder.query<PaymentMethodResponse, void>({
-      query: () => "/subscriptions/payment-method",
+      query: () => "/subscriptions/card-list",
       providesTags: ["Subscription"],
-      transformResponse: (response: { data: PaymentMethodResponse }) =>
-        response.data,
+      transformResponse: (response: {
+        data: { data: PaymentMethodResponse };
+      }) => response.data.data,
+    }),
+    //fetch billing portal details
+    getBillingPortal: builder.query<
+      { url: string; isCardAttached: boolean },
+      void
+    >({
+      query: () => ({
+        url: "/subscriptions/portal",
+        method: "GET",
+      }),
+      providesTags: ["Subscription"],
     }),
   }),
 });
@@ -95,4 +107,5 @@ export const {
   useGetVerifyPaymentQuery,
   useCreateCheckoutSessionMutation,
   useGetPaymentMethodQuery,
+  useGetBillingPortalQuery,
 } = subscriptionApi;

@@ -37,8 +37,18 @@ export const getCustomerByEmail = async (email: string) => {
       email,
       limit: 1,
     });
-
+    console.log("==>customers", customers);
     return customers.data[0] || null;
+  } catch (error: any) {
+    throw new Error(`Failed to fetch customer: ${error.message}`);
+  }
+};
+
+export const getCustomerById = async (customerId: string) => {
+  try {
+    const customer = await customStripe.customers.retrieve(customerId);
+
+    return customer;
   } catch (error: any) {
     throw new Error(`Failed to fetch customer: ${error.message}`);
   }

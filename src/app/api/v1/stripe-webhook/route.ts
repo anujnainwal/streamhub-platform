@@ -81,7 +81,7 @@ async function handleSubscriptionCreated(subscription: any) {
     userId: metadata.userId,
     planId: metadata.planId,
     status: subscription.status,
-    subscriptionId: subscription.id,
+    stripeSubscriptionId: subscription.id,
     stripeCustomerId: subscription.customer,
     currentPeriodStart: new Date(subscription.current_period_start * 1000),
     currentPeriodEnd: new Date(subscription.current_period_end * 1000),
@@ -99,8 +99,8 @@ async function handleSubscriptionCreated(subscription: any) {
     {
       userId: metadata.userId,
       $or: [
-        { subscriptionId: subscription.id },
-        { subscriptionId: `pending_${subscription.id}` },
+        { stripeSubscriptionId: subscription.id },
+        { stripeSubscriptionId: `pending_${subscription.id}` },
         {
           status: "incomplete",
           stripeCustomerId: subscription.customer,
@@ -142,11 +142,12 @@ async function handleSubscriptionUpdated(subscription: any) {
       : null,
     isTrial: isTrial,
     paymentMethodId: subscription.default_payment_method || "none",
+    paymentStatus: "paid",
   };
 
   const updated = await UserSubscriptionModel.findOneAndUpdate(
     {
-      subscriptionId: subscription.id,
+      stripeSubscriptionId: subscription.id,
       stripeCustomerId: subscription.customer,
     },
     updateData,
@@ -157,4 +158,51 @@ async function handleSubscriptionUpdated(subscription: any) {
     throw new Error(`Subscription not found for update: ${subscription.id}`);
   }
 }
-async function handleSubscriptionCanceled(subscription: any) {}
+async function handleSubscriptionCanceled(subscription: any) {
+  let cancelSubscriptionDetails = subscription;
+  let updateData = {
+    status: cancelSubscriptionDetails.status,
+    canceledAt: new Date(cancelSubscriptionDetails.canceled_at * 1000),
+    currentPeriodStart: new Date(
+      cancelSubscriptionDetails.current_period_start * 1000
+    ),
+    currentPeriodEnd: new Date(
+      cancelSubscriptionDetails.current_period_end * 1000
+    ),
+    cancelAtPeriodEnd: cancelSubscriptionDetails.cancel_at_period_end,
+    isTrial: false,
+    trialStart: new Date(cancelSubscriptionDetails.trial_start * 1000),
+    trialEnd: new Date(cancelSubscriptionDetails.trial_end * 1000),
+    paymentMethodId: cancelSubscriptionDetails.default_payment_method,
+  };
+  try {
+    const updated = await UserSubscriptionModel.findOneAndUpdate(
+      {
+        stripeSubscriptionId: subscription.id,
+        stripeCustomerId: subscription.customer,
+      },
+      { $set: updateData },
+      { new: true }
+    );
+
+    if (!updated) {
+      throw new Error(
+        `Subscription not found for canceled ID: ${subscription.id}`
+      );
+    }
+    // Optionally store cancellation reason
+    // if (subscription.cancellation_details?.reason) {
+    //   await SubscriptionEventModel.create({
+    //     userId: updated.userId,
+    //     subscriptionId: subscription.id,
+    //     eventType: "subscription_canceled",
+    //     reason: subscription.cancellation_details.reason,
+    //     eventPayload: subscription,
+    //     triggeredAt: new Date(),
+    //   });
+    // }
+    console.log("subscription cancelled successfully.------>");
+  } catch (error: any) {
+    console.log("error for subscriotion cancellation.-->", error);
+  }
+}
