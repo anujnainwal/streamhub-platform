@@ -97,6 +97,11 @@ export const subscriptionApi = createApi({
         url: "/subscriptions/portal",
         method: "GET",
       }),
+      transformResponse: (response: {
+        success: boolean;
+        message: string;
+        data: { url: string; isCardAttached: boolean };
+      }) => response.data,
       providesTags: ["Subscription"],
     }),
   }),
