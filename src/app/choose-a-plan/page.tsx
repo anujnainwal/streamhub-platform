@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useCreateCheckoutSessionMutation,
   useGetPlansQuery,
@@ -27,11 +27,23 @@ const SubscriptionPlansPage = () => {
   const [selectedPlan, setSelectedPlan] = useState<string>("Standard");
   const [selectedPlanId, setSelectedPlanId] = useState<any>("");
   const [selectedPlanDeatils, setSelectedPlanDetails] = useState<any>(null);
-
+  const [activePlan, setActivePlan] = useState<any>(null);
   const [step, setStep] = useState<number>(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const { data, error, isLoading }: any = useGetPlansQuery();
   const [token, setToken] = useLocalStorage<string>("token", "");
+
+  useEffect(() => {
+    if (data?.data?.plans) {
+      let getActiveDetails = data.data.plans.filter(
+        (plan: any) => plan.isActive === true
+      )[0];
+      setActivePlan(getActiveDetails);
+      setSelectedPlan(
+        getActiveDetails.isActive ? getActiveDetails.name : "Standard"
+      );
+    }
+  }, [data]);
 
   if (isLoading) {
     return (
@@ -99,8 +111,20 @@ const SubscriptionPlansPage = () => {
               <Button
                 size="lg"
                 onClick={() => setStep(2)}
-                disabled={!selectedPlan}
-                className="min-w-[200px]"
+                disabled={
+                  !selectedPlanId || selectedPlanId === activePlan?.plan_id
+                }
+                className={`min-w-[200px] ${
+                  !selectedPlanId || selectedPlanId === activePlan?.plan_id
+                    ? "cursor-none"
+                    : "cursor-pointer"
+                }`}
+                style={{
+                  cursor:
+                    !selectedPlanId || selectedPlanId === activePlan?.plan_id
+                      ? "not-allowed"
+                      : "pointer",
+                }}
               >
                 Continue with {selectedPlan}
               </Button>

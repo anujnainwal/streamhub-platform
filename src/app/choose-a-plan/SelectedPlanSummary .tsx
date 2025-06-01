@@ -97,8 +97,8 @@ const SelectedPlanSummary: React.FC<SelectedPlanSummaryProps> = ({
         cardId: selectedCardId,
       }).unwrap();
 
-      console.log("Subscription updated:", result);
       toast.success(result?.message || "Subscription updated successfully!");
+      setStep(1); // Go back to plan selection
     } catch (err) {
       console.error("Update failed:", err);
       toast.error(
