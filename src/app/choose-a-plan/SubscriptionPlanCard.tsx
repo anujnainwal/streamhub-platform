@@ -4,58 +4,79 @@ import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface Feature {
-  name: string;
-}
-interface Plan {
   _id: string;
   name: string;
-  price: { amount: number };
+  included: boolean;
+  limit: number | null;
+}
+
+interface Plan {
+  _id: string;
+  plan_id: number;
+  name: string;
+  description: string;
+  type: string;
+  status: string;
+  price: {
+    amount: number;
+    currency: string;
+  };
   interval: string;
   features: Feature[];
-  plan_id: string;
+  amount: number;
+  isActive: boolean;
 }
+
 interface SubscriptionPlanCardProps {
   plan: Plan;
-  isActive: boolean;
+  selectedPlanId: string | number | null;
   setSelectedPlan: (planName: string) => void;
-  setSelectedPlanId: (planId: string) => void;
-  isExpired?: boolean;
+  setSelectedPlanId: (planId: string | number) => void;
+
+  setSelectedPlanDetails: (plan: Plan) => void;
 }
+
 const SubscriptionPlanCard: React.FC<SubscriptionPlanCardProps> = ({
   plan,
-  isActive,
-  isExpired = false,
   setSelectedPlan,
   setSelectedPlanId,
+  setSelectedPlanDetails,
+  selectedPlanId,
 }) => {
   return (
     <Card
       key={plan._id}
-      className={`relative cursor-pointer transition-all duration-300 ${
-        isActive
-          ? "border-primary ring-2 ring-primary/20"
-          : isExpired
-          ? "border-destructive ring-2 ring-destructive/20"
-          : ""
+      // className={`relative cursor-pointer transition-all duration-300 border border-muted ${
+      //   plan.isActive
+      //     ? "border-[green] ring-2 ring-[green]"
+      //     : "hover:border-primary/50 hover:shadow-md"
+      // }`}
+      className={`relative cursor-pointer transition-all duration-300 border ${
+        plan.isActive
+          ? "border-green-600 ring-2 ring-green-400"
+          : plan.plan_id === selectedPlanId
+          ? "border-blue-600 ring-2 ring-blue-300"
+          : "border-muted hover:border-primary/50 hover:shadow-md"
       }`}
       onClick={() => {
         setSelectedPlan(plan.name);
         setSelectedPlanId(plan.plan_id);
+        setSelectedPlanDetails(plan);
       }}
     >
       {/* Status Badge */}
-      {(isActive || isExpired) && (
+      {plan.isActive && (
         <Badge
           className="absolute top-4 right-4 z-10"
-          variant={isActive ? "default" : "destructive"}
+          variant={plan.isActive ? "default" : "destructive"}
         >
-          {isActive ? "Active" : "Expired"}
+          {plan.isActive ? "Active" : "Expired"}
         </Badge>
       )}
       <CardHeader>
         <CardTitle className="text-center">
           {plan?.name}
-          {isActive && (
+          {plan.isActive && (
             <div className="absolute top-4 right-12">
               <Check className="h-5 w-5 text-primary" />
             </div>

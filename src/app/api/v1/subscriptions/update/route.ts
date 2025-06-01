@@ -7,6 +7,7 @@ import { verifyToken } from "@/utils/generateToken.utils";
 import { ApiResponse } from "@/utils/response.utils";
 import mongoose from "mongoose";
 import { NextRequest } from "next/server";
+import { decrypt } from "@/utils/encryption.utils";
 
 export async function PUT(request: NextRequest) {
   try {
@@ -35,11 +36,12 @@ export async function PUT(request: NextRequest) {
     const safeUserId = typeof userId === "string" ? userId : String(userId);
 
     const body = await request.json();
-    const { planId } = body;
+    const { planId, cardId } = body;
 
     if (!planId) {
       return ApiResponse.badRequest("Missing required fields.");
     }
+
     const subscriptionPlan = await SubscriptionPlanModel.findOne({
       plan_id: planId,
     });
@@ -53,7 +55,8 @@ export async function PUT(request: NextRequest) {
     if (!userSubscription) {
       return ApiResponse.notFound("User subscription not found.");
     }
-
+    let decryptedPaymentMethodId = decrypt(cardId);
+    console.log(decryptedPaymentMethodId);
     let stripeSubscriptionId = userSubscription.stripeSubscriptionId;
 
     const subscription = await customStripe.subscriptions.retrieve(
@@ -79,6 +82,7 @@ export async function PUT(request: NextRequest) {
           planId: `${subscriptionPlan._id}`,
         },
         proration_behavior: "create_prorations",
+        default_payment_method: decryptedPaymentMethodId,
       }
     );
 
@@ -87,7 +91,7 @@ export async function PUT(request: NextRequest) {
     userSubscription.paymentMethodId = "null";
     await userSubscription.save();
 
-    return ApiResponse.success("Subscription plan updated successfully.");
+    return ApiResponse.success(null, "Subscription updated successfully.");
   } catch (error) {
     console.error("PUT subscription error:", error);
     return ApiResponse.error("Failed to update subscription.");

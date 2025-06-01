@@ -43,6 +43,16 @@ interface PaymentMethodResponse {
   setupIntentClientSecret: string;
   cards: PaymentMethodData[];
 }
+interface UpdateSubscriptionRequest {
+  planId: number;
+  cardId: string;
+}
+
+interface UpdateSubscriptionResponse {
+  message: string;
+  success: boolean;
+  // Add more fields based on your API response
+}
 
 export const subscriptionApi = createApi({
   reducerPath: "subscriptionApi",
@@ -81,12 +91,17 @@ export const subscriptionApi = createApi({
       invalidatesTags: ["Subscription"],
     }),
     //fetch payment attached method
+    // getPaymentMethod: builder.query<PaymentMethodResponse, void>({
+    //   query: () => "/subscriptions/card-list",
+    //   providesTags: ["Subscription"],
+    //   transformResponse: (response: {
+    //     data: { data: PaymentMethodResponse };
+    //   }) => response.data.data,
+    // }),
     getPaymentMethod: builder.query<PaymentMethodResponse, void>({
       query: () => "/subscriptions/card-list",
       providesTags: ["Subscription"],
-      transformResponse: (response: {
-        data: { data: PaymentMethodResponse };
-      }) => response.data.data,
+      transformResponse: (response: any) => response.data,
     }),
     //fetch billing portal details
     getBillingPortal: builder.query<
@@ -104,6 +119,21 @@ export const subscriptionApi = createApi({
       }) => response.data,
       providesTags: ["Subscription"],
     }),
+    //updating or upgrading the plan
+    updateSubscriptionPlan: builder.mutation<
+      UpdateSubscriptionResponse,
+      UpdateSubscriptionRequest
+    >({
+      query: ({ planId, cardId }: UpdateSubscriptionRequest) => ({
+        url: "/subscriptions/update",
+        method: "PUT",
+        body: {
+          planId,
+          cardId,
+        },
+      }),
+      invalidatesTags: ["Subscription"],
+    }),
   }),
 });
 
@@ -113,4 +143,5 @@ export const {
   useCreateCheckoutSessionMutation,
   useGetPaymentMethodQuery,
   useGetBillingPortalQuery,
+  useUpdateSubscriptionPlanMutation,
 } = subscriptionApi;

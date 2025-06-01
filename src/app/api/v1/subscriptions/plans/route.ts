@@ -4,6 +4,8 @@ import dbConnect from "@/lib/db";
 import { subscriptionPlanValidationSchema } from "@/validation/subscriptions/subscriptions";
 import SubscriptionPlanModel from "@/models/subscriptionPlan.model";
 import customStripe from "@/lib/stripe";
+import { verifyToken } from "@/utils/generateToken.utils";
+import UserSubscriptionModel from "@/models/userSubscription.model";
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,22 +16,59 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const skip = (page - 1) * limit;
 
+    let userActivePlanId: string | null = null;
+
+    // Check and parse token
+    const authHeader =
+      request.headers.get("authorization") ||
+      request.headers.get("Authorization");
+
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.substring(7);
+
+      try {
+        const result = await verifyToken(token);
+
+        const userId =
+          typeof result?._id === "object" && (result?._id as any)?.buffer
+            ? Buffer.from(Object.values((result?._id as any).buffer)).toString(
+                "hex"
+              )
+            : result?._id;
+
+        const safeUserId = typeof userId === "string" ? userId : String(userId);
+
+        // Fetch user's subscription
+        const userSubscription = await UserSubscriptionModel.findOne({
+          userId: safeUserId,
+        });
+
+        if (userSubscription?.planId) {
+          userActivePlanId = userSubscription.planId.toString();
+        }
+      } catch (err) {
+        console.warn("Invalid or expired token. Proceeding anonymously.");
+      }
+    }
+
+    // Fetch and prepare plans
     const [plans, totalCount] = await Promise.all([
       SubscriptionPlanModel.aggregate([
         {
           $addFields: {
-            amount: "$price.amount", // flatten nested price.amount
+            amount: "$price.amount",
+            isActive: {
+              $cond: {
+                if: { $eq: [{ $toString: "$_id" }, userActivePlanId ?? ""] },
+                then: true,
+                else: false,
+              },
+            },
           },
         },
-        {
-          $sort: { amount: 1 }, // sort descending
-        },
-        {
-          $skip: skip,
-        },
-        {
-          $limit: limit,
-        },
+        { $sort: { amount: 1 } },
+        { $skip: skip },
+        { $limit: limit },
         {
           $project: {
             stripeProductId: 0,
@@ -61,7 +100,6 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
 export async function POST(request: NextRequest) {
   try {
     let body = await request.json();

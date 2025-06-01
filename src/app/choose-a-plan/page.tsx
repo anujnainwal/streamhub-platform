@@ -25,7 +25,8 @@ const SubscriptionPlansPage = () => {
   const router = useRouter();
   let authInfo = useSelector((state: any) => state.authInfo);
   const [selectedPlan, setSelectedPlan] = useState<string>("Standard");
-  const [selectedPlanId, setSelectedPlanId] = useState("");
+  const [selectedPlanId, setSelectedPlanId] = useState<any>("");
+  const [selectedPlanDeatils, setSelectedPlanDetails] = useState<any>(null);
 
   const [step, setStep] = useState<number>(1);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -85,10 +86,10 @@ const SubscriptionPlansPage = () => {
                   <React.Fragment key={plan._id}>
                     <SubscriptionPlanCard
                       plan={plan}
-                      isActive={isActive}
                       setSelectedPlan={setSelectedPlan}
                       setSelectedPlanId={setSelectedPlanId}
-                      isExpired={false}
+                      selectedPlanId={selectedPlanId}
+                      setSelectedPlanDetails={setSelectedPlanDetails}
                     />
                   </React.Fragment>
                 );
@@ -116,6 +117,7 @@ const SubscriptionPlansPage = () => {
               token={token}
               setToken={setToken}
               isActive={true}
+              selectedPlanDeatils={selectedPlanDeatils}
             />
           </>
         )}

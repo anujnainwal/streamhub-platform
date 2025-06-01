@@ -3,6 +3,7 @@ import customStripe from "@/lib/stripe";
 import { getCustomerByEmail, getCustomerById } from "@/lib/stripe.helper.lib";
 import UserModel from "@/models/userSchema.model";
 import UserSubscriptionModel from "@/models/userSubscription.model";
+import { encrypt } from "@/utils/encryption.utils";
 import { verifyToken } from "@/utils/generateToken.utils";
 import { ApiResponse } from "@/utils/response.utils";
 import mongoose from "mongoose";
@@ -81,17 +82,20 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const cards = paymentMethods.data.map((pm, idx) => ({
+    const cards = paymentMethods.data.map((pm, idx) => {
       // id: pm.id,
-      id: idx + 1,
-      brand: pm.card?.brand,
-      last4: pm.card?.last4,
-      expMonth: pm.card?.exp_month,
-      expYear: pm.card?.exp_year,
-      funding: pm.card?.funding,
-      country: pm.card?.country,
-      isDefault: pm.id === defaultPaymentMethodId,
-    }));
+      let encryptedId = encrypt(pm.id);
+      return {
+        id: encryptedId,
+        brand: pm.card?.brand,
+        last4: pm.card?.last4,
+        expMonth: pm.card?.exp_month,
+        expYear: pm.card?.exp_year,
+        funding: pm.card?.funding,
+        country: pm.card?.country,
+        isDefault: pm.id === defaultPaymentMethodId,
+      };
+    });
 
     return ApiResponse.success(
       {

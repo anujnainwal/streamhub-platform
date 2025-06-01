@@ -100,7 +100,6 @@ const Header = () => {
     }
   };
   let authInfo = useSelector((state?: any) => state.authInfo);
-  console.log(authInfo);
 
   const itemList = [
     {
