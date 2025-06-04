@@ -40,7 +40,7 @@ const SubscriptionPlansPage = () => {
       )[0];
       setActivePlan(getActiveDetails);
       setSelectedPlan(
-        getActiveDetails.isActive ? getActiveDetails.name : "Standard"
+        getActiveDetails?.isActive ? getActiveDetails.name : "Standard"
       );
     }
   }, [data]);
