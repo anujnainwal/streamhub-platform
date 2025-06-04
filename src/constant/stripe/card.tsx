@@ -53,3 +53,11 @@ const getCardIcon = (brand?: CardBrand): JSX.Element => {
 };
 
 export default getCardIcon;
+
+export const brandGradientMap: Record<string, string> = {
+  mastercard: "from-[#ff5f00] via-[#f79e1b] to-[#eb001b]", // orange-red gradient
+  visa: "from-blue-600 to-blue-400", // blue gradient
+  amex: "from-green-600 to-green-400", // green gradient
+  discover: "from-yellow-400 to-yellow-300", // yellow gradient
+  default: "from-gray-500 to-gray-400", // fallback gray gradient
+};

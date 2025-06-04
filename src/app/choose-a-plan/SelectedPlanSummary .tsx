@@ -8,6 +8,7 @@ import {
   useUpdateSubscriptionPlanMutation,
 } from "@/features/subscriptionApi/subscriptionApi";
 import { toast } from "sonner";
+import { brandGradientMap } from "@/constant/stripe/card";
 
 // Types for props
 interface Feature {

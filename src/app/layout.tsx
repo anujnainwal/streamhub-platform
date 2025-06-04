@@ -4,6 +4,7 @@ import "./globals.css";
 import Layouts from "../components/layouts/Layouts";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/sonner";
+import TokenExpiration from "@/components/tokenExpiration/TokenExpiration";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +32,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
+          <TokenExpiration />
           <Layouts>{children}</Layouts>
           <Toaster position="top-right" />
         </Providers>

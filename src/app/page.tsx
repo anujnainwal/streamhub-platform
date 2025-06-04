@@ -154,7 +154,7 @@ const page = () => {
                   value={`item-${faq.id}`}
                   className="border rounded-lg px-4 bg-[#F8F7FC]"
                 >
-                  <AccordionTrigger className="text-lg font-semibold hover:text-[#CE3824] transition-colors">
+                  <AccordionTrigger className="text-lg font-semibold hover:text-[#CE3824] transition-colors w-full flex items-center justify-between cursor-pointer">
                     {faq.question}
                   </AccordionTrigger>
                   <AccordionContent className="text-gray-600">
