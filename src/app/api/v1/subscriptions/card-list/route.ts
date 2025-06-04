@@ -82,20 +82,21 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const cards = paymentMethods.data.map((pm, idx) => {
-      // id: pm.id,
-      let encryptedId = encrypt(pm.id);
-      return {
-        id: encryptedId,
-        brand: pm.card?.brand,
-        last4: pm.card?.last4,
-        expMonth: pm.card?.exp_month,
-        expYear: pm.card?.exp_year,
-        funding: pm.card?.funding,
-        country: pm.card?.country,
-        isDefault: pm.id === defaultPaymentMethodId,
-      };
-    });
+    const cards = paymentMethods.data
+      .filter((pm) => pm.id && pm.card) // filter out invalid or incomplete entries
+      .map((pm) => {
+        let encryptedId = encrypt(pm.id);
+        return {
+          id: encryptedId,
+          brand: pm.card.brand,
+          last4: pm.card.last4,
+          expMonth: pm.card.exp_month,
+          expYear: pm.card.exp_year,
+          funding: pm.card.funding,
+          country: pm.card.country,
+          isDefault: pm.id === defaultPaymentMethodId,
+        };
+      });
 
     return ApiResponse.success(
       {
