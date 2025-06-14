@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     if (!userDetails) {
       return ApiResponse.notFound("User not found");
     }
-    console.log("userDetails", planDetails);
+
     if (!planDetails) {
       return ApiResponse.notFound("Plan not found");
     }
@@ -85,8 +85,8 @@ export async function POST(request: Request) {
         status: "incomplete",
         stripeCustomerId: stripeCustomerId.id,
         subscriptionId: "pending_" + session.id,
-        currentPeriodStart: new Date(),
-        currentPeriodEnd: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        currentPeriodStart: null,
+        currentPeriodEnd: null,
         paymentMethodId: "pending",
         isTrial: false,
       },
