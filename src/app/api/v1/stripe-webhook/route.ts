@@ -217,7 +217,7 @@ async function handleSubscriptionCanceled(subscription: any) {
 }
 
 // Customer trial peroid end soon.
-export async function handleTrialPeriodWillEndSoon(subscription: any) {
+async function handleTrialPeriodWillEndSoon(subscription: any) {
   try {
     const metadata = subscription.metadata || {};
 
