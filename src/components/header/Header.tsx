@@ -144,7 +144,7 @@ const Header = () => {
           id: 2,
           label: "Subscribe Now",
           icon: FaCreditCard,
-          value: "subscribe-now",
+          value: "login",
         },
       ];
 

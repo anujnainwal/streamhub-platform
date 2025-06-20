@@ -57,6 +57,15 @@ export async function POST(request: Request) {
         );
       }
 
+      case "customer.subscription.trial_will_end": {
+        const subscription = event.data.object;
+        await handleTrialPeriodWillEndSoon(subscription);
+        return ApiResponse.success(
+          { event: event.type },
+          "Trial Peroid End Soon."
+        );
+      }
+
       default: {
         console.log(`Unhandled event type: ${event.type}`);
         return ApiResponse.success(
@@ -108,7 +117,7 @@ async function handleSubscriptionCreated(subscription: any) {
       ],
     },
     subscriptionData,
-    { upsert: true, new: true }
+    { upsert: true, new: true, setDefaultsOnInsert: true }
   );
 
   if (!result) {
@@ -204,5 +213,49 @@ async function handleSubscriptionCanceled(subscription: any) {
     console.log("subscription cancelled successfully.------>");
   } catch (error: any) {
     console.log("error for subscriotion cancellation.-->", error);
+  }
+}
+
+// Customer trial peroid end soon.
+export async function handleTrialPeriodWillEndSoon(subscription: any) {
+  try {
+    const metadata = subscription.metadata || {};
+
+    const subscriptionData = {
+      userId: metadata.userId,
+      planId: metadata.planId,
+      status: subscription.status,
+      stripeSubscriptionId: subscription.id,
+      stripeCustomerId: subscription.customer,
+      currentPeriodStart: new Date(subscription.current_period_start * 1000),
+      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      trialStart: subscription.trial_start
+        ? new Date(subscription.trial_start * 1000)
+        : null,
+      trialEnd: subscription.trial_end
+        ? new Date(subscription.trial_end * 1000)
+        : null,
+      isTrial: subscription.status === "trialing",
+      paymentMethodId: subscription.default_payment_method || "none",
+    };
+
+    const result = await UserSubscriptionModel.findOneAndUpdate(
+      {
+        userId: metadata.userId,
+      },
+      subscriptionData,
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    if (!result) {
+      throw new Error("Failed to create or update subscription record");
+    }
+    console.log("trial Notification Send Successfully..s");
+
+    // You can send an email or notification here if needed
+    // await sendTrialEndingEmail(metadata.userId, subscriptionData.trialEnd);
+  } catch (error: any) {
+    console.error("Error in handleTrialPeriodWillEndSoon:", error.message);
+    throw error;
   }
 }

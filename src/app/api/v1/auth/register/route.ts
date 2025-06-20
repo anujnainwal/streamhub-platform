@@ -47,7 +47,8 @@ export async function POST(request: NextRequest) {
     });
     let accessToken = await generateToken({ _id: newUser._id });
     return ApiResponse.created(
-      { newUser, token: accessToken },
+      // { newUser, token: accessToken },
+      { newUser },
       "Registration successful"
     );
   } catch (error: any) {

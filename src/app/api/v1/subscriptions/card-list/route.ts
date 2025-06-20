@@ -83,20 +83,22 @@ export async function GET(request: NextRequest) {
     }
 
     const cards = paymentMethods.data
-      .filter((pm) => pm.id && pm.card) // filter out invalid or incomplete entries
+      .filter((pm) => pm.id && pm.card) // Ensure the card object exists
       .map((pm: any) => {
         let encryptedId = encrypt(pm.id);
         return {
           id: encryptedId,
           brand: pm.card?.brand,
-          last4: pm?.last4,
-          expMonth: pm?.exp_month,
-          expYear: pm?.exp_year,
+          last4: pm.card?.last4, // <-- Corrected
+          expMonth: pm.card?.exp_month, // <-- Corrected
+          expYear: pm.card?.exp_year, // <-- Corrected
           funding: pm.card?.funding,
           country: pm.card?.country,
           isDefault: pm.id === defaultPaymentMethodId,
         };
       });
+
+    console.log("==>", cards);
 
     return ApiResponse.success(
       {
